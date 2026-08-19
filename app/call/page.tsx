@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, useRef, useCallback } from "react";
+import React, { useState, useEffect, useRef, useCallback, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import {
   Loader2,
@@ -23,7 +23,7 @@ import { soundFX } from "@/lib/audio/sounds";
 import { COUNTRIES } from "@/lib/data/countries";
 import { ChatMessage, Gender, ReactionEvent, ReportReason } from "@/lib/types";
 
-export default function CallPage() {
+function CallContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const uid = searchParams.get("uid") || "";
@@ -672,5 +672,20 @@ export default function CallPage() {
         onSubmitReport={handleSubmitReport}
       />
     </div>
+  );
+}
+
+export default function CallPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="w-screen h-screen bg-background flex flex-col items-center justify-center text-text">
+          <Loader2 className="w-10 h-10 text-accent animate-spin mb-3" />
+          <p className="text-xs font-mono text-text-muted">Loading V-Chat stream...</p>
+        </div>
+      }
+    >
+      <CallContent />
+    </Suspense>
   );
 }
