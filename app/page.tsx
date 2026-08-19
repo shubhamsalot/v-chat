@@ -15,8 +15,11 @@ import {
   Lock,
   User,
   Globe,
-  Users2,
-  Award,
+  Flame,
+  Zap,
+  Radio,
+  SlidersHorizontal,
+  Compass,
 } from "lucide-react";
 import { Navbar } from "@/components/Navbar";
 import { AgeGateModal } from "@/components/AgeGateModal";
@@ -27,6 +30,16 @@ import { CountrySelector } from "@/components/CountrySelector";
 import { COUNTRIES } from "@/lib/data/countries";
 import { Gender, UserAccount, UserProfile } from "@/lib/types";
 
+const TRENDING_TAGS = [
+  { icon: "🎮", label: "Gaming" },
+  { icon: "🎵", label: "Music" },
+  { icon: "☕", label: "Late Night Chill" },
+  { icon: "🌎", label: "Language Exchange" },
+  { icon: "🍿", label: "Anime & Movies" },
+  { icon: "💻", label: "Tech & Code" },
+  { icon: "🎨", label: "Art & Design" },
+];
+
 export default function LandingPage() {
   const router = useRouter();
   const videoPreviewRef = useRef<HTMLVideoElement>(null);
@@ -36,7 +49,7 @@ export default function LandingPage() {
   const [nickname, setNickname] = useState("");
   const [interestsText, setInterestsText] = useState("");
 
-  // OmeTV Filter State
+  // Filter State
   const [preferredCountry, setPreferredCountry] = useState("GLOBAL");
   const [preferredGender, setPreferredGender] = useState<Gender>("all");
 
@@ -83,7 +96,6 @@ export default function LandingPage() {
     };
     setUser(initialUser);
 
-    // Sync profile with backend
     fetch("/api/auth/profile", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -116,7 +128,7 @@ export default function LandingPage() {
       } catch (err: any) {
         console.warn("[Media] Camera/Mic access denied:", err);
         setCameraError(
-          "Camera or microphone permission was denied. Please allow device access in your browser settings to enter video chat."
+          "Camera or microphone access was denied. Please allow camera permissions to chat."
         );
       }
     }
@@ -148,6 +160,19 @@ export default function LandingPage() {
         videoTrack.enabled = !videoTrack.enabled;
         setIsVideoMuted(!videoTrack.enabled);
       }
+    }
+  };
+
+  // Toggle trending tag in input
+  const handleTagClick = (tagLabel: string) => {
+    const existing = interestsText
+      .split(",")
+      .map((t) => t.trim())
+      .filter(Boolean);
+    if (existing.includes(tagLabel)) {
+      setInterestsText(existing.filter((t) => t !== tagLabel).join(", "));
+    } else {
+      setInterestsText([...existing, tagLabel].join(", "));
     }
   };
 
@@ -262,7 +287,11 @@ export default function LandingPage() {
   const userUid = user ? (user as any).id || (user as any).uid || "" : "";
 
   return (
-    <div className="min-h-screen bg-background flex flex-col">
+    <div className="min-h-screen bg-[#090A0F] text-slate-100 flex flex-col relative overflow-hidden">
+      {/* Dynamic Background Mesh Elements */}
+      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[1000px] h-[400px] bg-gradient-to-b from-rose-600/10 via-amber-500/5 to-transparent blur-3xl pointer-events-none" />
+      <div className="absolute bottom-0 right-0 w-[500px] h-[500px] bg-rose-600/5 blur-3xl pointer-events-none" />
+
       <Navbar
         user={user}
         onOpenAgeGate={() => setIsAgeModalOpen(true)}
@@ -271,35 +300,41 @@ export default function LandingPage() {
         onOpenHistory={() => setIsHistoryOpen(true)}
       />
 
-      <main className="flex-1 max-w-4xl w-full mx-auto px-4 py-8 sm:py-10 flex flex-col items-center justify-center">
-        {/* Header Title */}
-        <div className="text-center mb-6">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded bg-surface border border-surface-border text-xs text-text-muted mb-3 font-mono">
-            <span className="w-2 h-2 rounded-full bg-accent animate-ping" />
-            OME-TV 1:1 WEBRTC VIDEO STREAM
+      <main className="flex-1 max-w-5xl w-full mx-auto px-4 py-8 sm:py-12 flex flex-col items-center justify-center relative z-10">
+        {/* Hero Header */}
+        <div className="text-center mb-8 max-w-2xl mx-auto">
+          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-gradient-to-r from-rose-500/15 via-rose-500/10 to-amber-500/15 border border-rose-500/30 text-xs font-semibold text-rose-400 mb-4 shadow-lg shadow-rose-500/10">
+            <span className="relative flex h-2 w-2">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-rose-400 opacity-75" />
+              <span className="relative inline-flex rounded-full h-2 w-2 bg-rose-500" />
+            </span>
+            <span className="font-mono tracking-wider uppercase">
+              ⚡ LIVE 1:1 WEBRTC VIDEO CALLS
+            </span>
           </div>
-          <h1 className="text-3xl sm:text-5xl font-display font-extrabold tracking-tight text-text">
-            TALK TO STRANGERS
+
+          <h1 className="text-4xl sm:text-6xl font-black tracking-tight text-white font-sans">
+            CONNECT WITH <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#FF334B] via-[#FF6B7A] to-amber-400">STRANGERS</span>
           </h1>
-          <p className="text-sm text-text-muted mt-1 max-w-md mx-auto">
-            Random 1:1 video chats with country & gender filters. Fast, moderated, no logs.
+          <p className="text-sm sm:text-base text-slate-400 mt-3 leading-relaxed">
+            Instantly pair with random verified adults worldwide. High quality video, country filters, and real-time AI moderation.
           </p>
         </div>
 
-        {/* Camera Preview Tile & Controls */}
-        <div className="w-full max-w-lg bg-surface border border-surface-border rounded-md overflow-hidden shadow-2xl relative mb-6">
-          {/* Video Preview */}
-          <div className="relative aspect-video bg-black flex items-center justify-center">
+        {/* Video Card Container */}
+        <div className="w-full max-w-xl bg-slate-900/80 backdrop-blur-2xl border border-white/10 rounded-2xl overflow-hidden shadow-2xl relative mb-8 ring-1 ring-white/10 group">
+          {/* Top Camera Stream Box */}
+          <div className="relative aspect-video bg-black flex items-center justify-center overflow-hidden">
             {cameraError ? (
-              <div className="p-6 text-center text-text-muted">
-                <AlertCircle className="w-10 h-10 text-danger mx-auto mb-2" />
-                <p className="text-xs text-text font-semibold mb-1">Camera Access Required</p>
-                <p className="text-[11px] leading-relaxed text-text-muted">{cameraError}</p>
+              <div className="p-6 text-center text-slate-400">
+                <AlertCircle className="w-12 h-12 text-rose-500 mx-auto mb-2" />
+                <p className="text-sm text-white font-bold mb-1">Camera Access Required</p>
+                <p className="text-xs text-slate-400 max-w-xs">{cameraError}</p>
               </div>
             ) : isVideoMuted ? (
-              <div className="flex flex-col items-center justify-center text-text-muted">
-                <VideoOff className="w-10 h-10 text-text-dark mb-2" />
-                <span className="text-xs">Camera is paused</span>
+              <div className="flex flex-col items-center justify-center text-slate-500">
+                <VideoOff className="w-12 h-12 text-slate-600 mb-2" />
+                <span className="text-xs font-medium">Camera is paused</span>
               </div>
             ) : (
               <video
@@ -312,14 +347,14 @@ export default function LandingPage() {
             )}
 
             {/* Quick Media Controls Badge */}
-            <div className="absolute bottom-3 left-3 flex items-center gap-2">
+            <div className="absolute bottom-4 left-4 flex items-center gap-2 z-20">
               <button
                 onClick={toggleMic}
                 title={isMicMuted ? "Unmute Mic" : "Mute Mic"}
-                className={`p-2 rounded border text-xs ${
+                className={`p-2.5 rounded-xl border text-xs backdrop-blur-md transition-all shadow-lg ${
                   isMicMuted
-                    ? "bg-danger/20 border-danger text-danger"
-                    : "bg-surface/80 backdrop-blur-sm border-surface-border text-text hover:bg-surface"
+                    ? "bg-rose-500/30 border-rose-500 text-rose-400"
+                    : "bg-slate-900/80 border-white/15 text-white hover:bg-slate-800"
                 }`}
               >
                 {isMicMuted ? <MicOff className="w-4 h-4" /> : <Mic className="w-4 h-4" />}
@@ -327,41 +362,46 @@ export default function LandingPage() {
               <button
                 onClick={toggleVideo}
                 title={isVideoMuted ? "Turn Video On" : "Turn Video Off"}
-                className={`p-2 rounded border text-xs ${
+                className={`p-2.5 rounded-xl border text-xs backdrop-blur-md transition-all shadow-lg ${
                   isVideoMuted
-                    ? "bg-danger/20 border-danger text-danger"
-                    : "bg-surface/80 backdrop-blur-sm border-surface-border text-text hover:bg-surface"
+                    ? "bg-rose-500/30 border-rose-500 text-rose-400"
+                    : "bg-slate-900/80 border-white/15 text-white hover:bg-slate-800"
                 }`}
               >
                 {isVideoMuted ? <VideoOff className="w-4 h-4" /> : <Video className="w-4 h-4" />}
               </button>
             </div>
 
-            {/* Mirror Indicator */}
-            <div className="absolute top-3 right-3 px-2 py-0.5 rounded bg-background/80 backdrop-blur-sm border border-surface-border text-[10px] font-mono text-text-muted">
-              Live Preview (Mirrored)
+            {/* Live Indicator Pill */}
+            <div className="absolute top-4 right-4 px-3 py-1 rounded-full bg-black/60 backdrop-blur-md border border-white/15 text-[11px] font-semibold text-slate-300 flex items-center gap-1.5 z-20">
+              <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+              <span>Self Preview</span>
             </div>
           </div>
 
-          {/* Form Controls */}
-          <div className="p-5 space-y-4 bg-surface">
+          {/* Controls & Form Section */}
+          <div className="p-6 space-y-5 bg-gradient-to-b from-slate-900/90 to-slate-950/90">
             {errorMessage && (
-              <div className="p-3 rounded bg-danger/10 border border-danger/40 text-danger text-xs flex items-start gap-2">
+              <div className="p-3.5 rounded-xl bg-rose-500/10 border border-rose-500/30 text-rose-400 text-xs flex items-start gap-2.5">
                 <AlertCircle className="w-4 h-4 shrink-0 mt-0.5" />
                 <span>{errorMessage}</span>
               </div>
             )}
 
-            {/* OmeTV Filters: Country & Gender Selection */}
-            <div className="p-3 bg-background rounded border border-surface-border space-y-3">
-              <div className="text-[11px] font-bold uppercase tracking-wider text-text-muted flex items-center gap-1.5">
-                <Globe className="w-3.5 h-3.5 text-accent" />
-                Matchmaking Filters (OmeTV Style)
+            {/* Matchmaking Filter Bar */}
+            <div className="p-4 bg-slate-950/80 rounded-xl border border-white/[0.08] space-y-3 shadow-inner">
+              <div className="text-[11px] font-bold uppercase tracking-wider text-slate-400 flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <SlidersHorizontal className="w-3.5 h-3.5 text-rose-500" />
+                  <span>Matching Filters</span>
+                </div>
+                <span className="text-[10px] text-emerald-400 font-mono">100% Free</span>
               </div>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-[11px] font-semibold text-text-dark mb-1">
-                    Stranger Country
+                  <label className="block text-[11px] font-semibold text-slate-400 mb-1">
+                    Country Target
                   </label>
                   <CountrySelector
                     selectedCountry={preferredCountry}
@@ -370,17 +410,17 @@ export default function LandingPage() {
                 </div>
 
                 <div>
-                  <label className="block text-[11px] font-semibold text-text-dark mb-1">
+                  <label className="block text-[11px] font-semibold text-slate-400 mb-1">
                     Gender Filter
                   </label>
                   <select
                     value={preferredGender}
                     onChange={(e) => setPreferredGender(e.target.value as Gender)}
-                    className="w-full px-3 py-1.5 rounded bg-surface border border-surface-border text-xs text-text focus:outline-none focus:border-accent"
+                    className="w-full px-3 py-2 rounded-lg bg-slate-900 border border-white/10 text-xs text-white focus:outline-none focus:border-rose-500 transition-colors cursor-pointer"
                   >
-                    <option value="all">Any Gender (Free)</option>
-                    <option value="female">Female Only</option>
-                    <option value="male">Male Only</option>
+                    <option value="all">Any Gender (Worldwide)</option>
+                    <option value="female">Female Match</option>
+                    <option value="male">Male Match</option>
                   </select>
                 </div>
               </div>
@@ -389,8 +429,8 @@ export default function LandingPage() {
             {/* Nickname & Interests */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div>
-                <label className="block text-xs font-semibold text-text-muted mb-1 flex items-center gap-1.5">
-                  <User className="w-3.5 h-3.5 text-text-dark" />
+                <label className="block text-xs font-semibold text-slate-400 mb-1.5 flex items-center gap-1.5">
+                  <User className="w-3.5 h-3.5 text-rose-500" />
                   Your Nickname
                 </label>
                 <input
@@ -400,55 +440,86 @@ export default function LandingPage() {
                   value={nickname}
                   onChange={(e) => setNickname(e.target.value)}
                   maxLength={24}
-                  className="w-full px-3 py-2 rounded bg-background border border-surface-border text-xs text-text placeholder:text-text-dark focus:outline-none focus:border-accent"
+                  className="w-full px-3.5 py-2.5 rounded-xl bg-slate-950 border border-white/10 text-xs text-white placeholder:text-slate-600 focus:outline-none focus:border-rose-500 transition-colors"
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-text-muted mb-1 flex items-center gap-1.5">
-                  <Tag className="w-3.5 h-3.5 text-text-dark" />
-                  Interests (Optional)
+                <label className="block text-xs font-semibold text-slate-400 mb-1.5 flex items-center gap-1.5">
+                  <Tag className="w-3.5 h-3.5 text-rose-500" />
+                  Interests
                 </label>
                 <input
                   id="interests-input"
                   type="text"
-                  placeholder="gaming, music, coding"
+                  placeholder="gaming, music, anime"
                   value={interestsText}
                   onChange={(e) => setInterestsText(e.target.value)}
-                  className="w-full px-3 py-2 rounded bg-background border border-surface-border text-xs text-text placeholder:text-text-dark focus:outline-none focus:border-accent"
+                  className="w-full px-3.5 py-2.5 rounded-xl bg-slate-950 border border-white/10 text-xs text-white placeholder:text-slate-600 focus:outline-none focus:border-rose-500 transition-colors"
                 />
               </div>
             </div>
 
-            {/* Age Gate Warning Status */}
+            {/* Trending Interests Quick Pills */}
+            <div>
+              <div className="text-[11px] font-semibold text-slate-500 mb-2 flex items-center gap-1">
+                <Flame className="w-3 h-3 text-amber-500" />
+                <span>Trending Topics (Click to add)</span>
+              </div>
+              <div className="flex flex-wrap gap-1.5">
+                {TRENDING_TAGS.map((tag) => {
+                  const isSelected = interestsText.toLowerCase().includes(tag.label.toLowerCase());
+                  return (
+                    <button
+                      key={tag.label}
+                      type="button"
+                      onClick={() => handleTagClick(tag.label)}
+                      className={`text-[11px] px-2.5 py-1 rounded-lg border transition-all flex items-center gap-1 ${
+                        isSelected
+                          ? "bg-rose-500/20 border-rose-500 text-rose-300 font-bold shadow-sm"
+                          : "bg-slate-950/80 border-white/10 text-slate-400 hover:text-white hover:border-white/20"
+                      }`}
+                    >
+                      <span>{tag.icon}</span>
+                      <span>{tag.label}</span>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* Age Gate Warning Status if unconfirmed */}
             {!user?.ageConfirmed && (
-              <div className="p-2.5 rounded bg-amber-500/10 border border-amber-500/20 text-[11px] text-amber-300 flex items-center justify-between">
+              <div className="p-3 rounded-xl bg-amber-500/10 border border-amber-500/30 text-xs text-amber-300 flex items-center justify-between">
                 <div className="flex items-center gap-2">
-                  <Lock className="w-3.5 h-3.5 shrink-0" />
+                  <Lock className="w-4 h-4 shrink-0 text-amber-400" />
                   <span>Age verification required (18+)</span>
                 </div>
                 <button
                   onClick={() => setIsAgeModalOpen(true)}
-                  className="underline hover:text-amber-200 font-semibold"
+                  className="underline hover:text-amber-200 font-bold text-xs"
                 >
-                  Verify Now
+                  Verify 18+
                 </button>
               </div>
             )}
 
-            {/* Start Button */}
+            {/* Glowing Call Start Button */}
             <button
               id="start-chat-button"
               onClick={handleStart}
               disabled={isJoining}
-              className={`w-full py-3 rounded text-sm font-bold uppercase tracking-wider flex items-center justify-center gap-2 transition-all ${
+              className={`w-full py-4 rounded-xl text-sm font-extrabold uppercase tracking-wider flex items-center justify-center gap-2.5 transition-all shadow-xl ${
                 !user?.ageConfirmed
-                  ? "bg-surface-muted text-text-muted hover:bg-surface-border border border-surface-border cursor-pointer"
-                  : "bg-accent hover:bg-accent-hover text-white shadow-lg hover:shadow-accent/20 cursor-pointer active:scale-[0.99]"
+                  ? "bg-slate-800 text-slate-400 hover:bg-slate-700 border border-white/10 cursor-pointer"
+                  : "bg-gradient-to-r from-rose-500 via-rose-600 to-rose-700 hover:from-rose-600 hover:to-rose-800 text-white shadow-rose-500/30 hover:shadow-rose-500/50 cursor-pointer active:scale-[0.98] animate-glow"
               }`}
             >
               {isJoining ? (
-                <span>Finding Stranger...</span>
+                <div className="flex items-center gap-2">
+                  <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                  <span>Connecting to Stranger...</span>
+                </div>
               ) : !user?.ageConfirmed ? (
                 <>
                   <Lock className="w-4 h-4" />
@@ -456,30 +527,34 @@ export default function LandingPage() {
                 </>
               ) : (
                 <>
-                  <Video className="w-4 h-4" />
+                  <Zap className="w-5 h-5 fill-white" />
                   Start Video Chat
-                  <ArrowRight className="w-4 h-4" />
+                  <ArrowRight className="w-5 h-5" />
                 </>
               )}
             </button>
           </div>
         </div>
 
-        {/* Safety & OmeTV Badges Footer */}
-        <div className="flex flex-wrap items-center justify-center gap-3 sm:gap-4 text-xs text-text-muted font-medium">
-          <div className="flex items-center gap-1.5">
-            <Shield className="w-3.5 h-3.5 text-accent" />
-            <span>Strict 18+ Community</span>
+        {/* Feature Highlights Footer */}
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 w-full max-w-xl text-center">
+          <div className="p-3.5 rounded-xl bg-slate-900/60 border border-white/[0.06] backdrop-blur-md">
+            <div className="text-rose-400 font-extrabold text-sm mb-0.5 flex items-center justify-center gap-1">
+              <Zap className="w-4 h-4" /> Ultra-Fast WebRTC
+            </div>
+            <div className="text-[11px] text-slate-400">Direct peer-to-peer live streaming</div>
           </div>
-          <span>•</span>
-          <div className="flex items-center gap-1.5">
-            <Globe className="w-3.5 h-3.5 text-accent" />
-            <span>Worldwide Matchmaking</span>
+          <div className="p-3.5 rounded-xl bg-slate-900/60 border border-white/[0.06] backdrop-blur-md">
+            <div className="text-amber-400 font-extrabold text-sm mb-0.5 flex items-center justify-center gap-1">
+              <Shield className="w-4 h-4" /> Perspective AI
+            </div>
+            <div className="text-[11px] text-slate-400">Automated toxic message filtering</div>
           </div>
-          <span>•</span>
-          <div className="flex items-center gap-1.5">
-            <Sparkles className="w-3.5 h-3.5 text-accent" />
-            <span>AI Moderated</span>
+          <div className="p-3.5 rounded-xl bg-slate-900/60 border border-white/[0.06] backdrop-blur-md">
+            <div className="text-emerald-400 font-extrabold text-sm mb-0.5 flex items-center justify-center gap-1">
+              <Globe className="w-4 h-4" /> Global Reach
+            </div>
+            <div className="text-[11px] text-slate-400">22+ countries supported</div>
           </div>
         </div>
       </main>
