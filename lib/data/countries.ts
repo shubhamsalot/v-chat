@@ -1,0 +1,26 @@
+import { Country } from "@/lib/types";
+
+export const COUNTRIES: Country[] = [
+  { code: "GLOBAL", name: "Global / Worldwide", flag: "🌐" },
+  { code: "US", name: "United States", flag: "🇺🇸" },
+  { code: "IN", name: "India", flag: "🇮🇳" },
+  { code: "GB", name: "United Kingdom", flag: "🇬🇧" },
+  { code: "CA", name: "Canada", flag: "🇨🇦" },
+  { code: "AU", name: "Australia", flag: "🇦🇺" },
+  { code: "DE", name: "Germany", flag: "🇩🇪" },
+  { code: "FR", name: "France", flag: "🇫🇷" },
+  { code: "BR", name: "Brazil", flag: "🇧🇷" },
+  { code: "JP", name: "Japan", flag: "🇯🇵" },
+  { code: "KR", name: "South Korea", flag: "🇰🇷" },
+  { code: "ES", name: "Spain", flag: "🇪🇸" },
+  { code: "IT", name: "Italy", flag: "🇮🇹" },
+  { code: "MX", name: "Mexico", flag: "🇲🇽" },
+  { code: "TR", name: "Turkey", flag: "🇹🇷" },
+  { code: "ID", name: "Indonesia", flag: "🇮🇩" },
+  { code: "PH", name: "Philippines", flag: "🇵🇭" },
+  { code: "RU", name: "Russia", flag: "🇷🇺" },
+  { code: "UA", name: "Ukraine", flag: "🇺🇦" },
+  { code: "NL", name: "Netherlands", flag: "🇳🇱" },
+  { code: "SE", name: "Sweden", flag: "🇸🇪" },
+  { code: "AE", name: "United Arab Emirates", flag: "🇦🇪" },
+];
