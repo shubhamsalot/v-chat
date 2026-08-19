@@ -9,6 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@supabase/supabase-js": "^2.109.0",
     "clsx": "^2.1.1",
     "firebase": "^10.13.0",
     "firebase-admin": "^12.4.0",
