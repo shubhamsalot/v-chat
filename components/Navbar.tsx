@@ -80,7 +80,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                   src={
                     user.avatarUrl ||
                     `https://api.dicebear.com/7.x/bottts/svg?seed=${encodeURIComponent(
-                      (user as any).id || user.uid
+                      (user as any).id || (user as any).uid
                     )}`
                   }
                   alt="avatar"

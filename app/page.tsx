@@ -155,7 +155,7 @@ export default function LandingPage() {
   const handleConfirmAge = async () => {
     if (!user) return;
     try {
-      const uid = (user as any).id || user.uid;
+      const uid = (user as any).id || (user as any).uid;
       const res = await fetch("/api/auth/profile", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -221,7 +221,7 @@ export default function LandingPage() {
       .filter(Boolean);
 
     try {
-      const uid = (user as any).id || user.uid;
+      const uid = (user as any).id || (user as any).uid;
       const res = await fetch("/api/matchmaking/join", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -259,7 +259,7 @@ export default function LandingPage() {
     }
   };
 
-  const userUid = user ? (user as any).id || user.uid : "";
+  const userUid = user ? (user as any).id || (user as any).uid || "" : "";
 
   return (
     <div className="min-h-screen bg-background flex flex-col">

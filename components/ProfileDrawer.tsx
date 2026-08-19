@@ -36,7 +36,7 @@ export const ProfileDrawer: React.FC<ProfileDrawerProps> = ({
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          uid: (user as any).id || user.uid,
+          uid: (user as any).id || (user as any).uid,
           displayName,
           country,
           gender,
@@ -78,7 +78,7 @@ export const ProfileDrawer: React.FC<ProfileDrawerProps> = ({
               src={
                 user.avatarUrl ||
                 `https://api.dicebear.com/7.x/bottts/svg?seed=${encodeURIComponent(
-                  (user as any).id || user.uid
+                  (user as any).id || (user as any).uid
                 )}`
               }
               alt="avatar"
